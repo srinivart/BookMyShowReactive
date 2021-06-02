@@ -1,0 +1,458 @@
+
+we are going to write one controller
+To consume this BookMyShow
+
+so to consume this we need request body as payload
+
+
+
+so copy -> BookRequest
+
+
+we don't need all the persistence related annotations
+
+
+
+--> and mention,
+
+@RestController
+
+in consuming client
+
+
+--> specify the web client here 
+
+
+here we need to set the base uri & the content type in web client
+
+here we are not injecting directly using autowired
+
+
+--> so write one method
+
+in init() method we intialize the webclient
+
+with the required parameter
+
+
+
+here base URI is 
+http://localhost:9090/BookMyShow/Service/
+
+
+
+
+
+public void init()
+
+-->
+
+we want this should be intialized when the application is up
+
+so use 
+
+@PostConstruct
+
+
+
+
+
+now write 
+
+
+now we are going to invoke the bookmyshow provider using 
+webclient
+
+
+in post we are going to add the request body.
+
+that is : BookRequest..
+
+
+add the body using syncBody
+
+get the response using retrieve
+
+it is going to give single response
+so specify the bodyToMono(String.class)
+
+
+
+
+
+
+so we are writing post method...
+so annotate with 
+
+@PostMapping
+
+
+specify the client url ("/bookNow")
+
+also specify the root url for client
+
+
+
+@RequestMapping("/bookMyShow")
+
+
+so we can access this by
+
+/bookMyShow-client/bookMyShow
+
+
+
+
+
+
+
+---> 
+
+Now write the GET method
+
+
+
+
+after using retrieve data
+
+its going to give to list of BookRequest
+
+so it should not be List
+
+
+so change it Flux
+
+
+and specify the return type class
+.bodyToFlux()
+
+
+
+
+
+
+--> 
+
+write a method which get the booking
+
+based on the booking id
+
+
+
+retrieve .. its going to give BodyToMono
+
+single instance, not a stream
+
+of type BookRequest.class
+
+
+
+
+
+
+
+
+
+PUT
+--->
+
+write method for PUT
+similar to the post
+
+
+just need to speicify the method type uri
+
+and request body that you are going to update
+
+to perform the put one
+
+
+
+
+
+Delete 
+------
+delete will give one single  sting message
+
+
+
+
+our booking id is runtime parameter
+so use @PathVariable
+
+
+retrieve will give us single string
+of type string
+
+so bodyToMono(String.class)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+----->
+
+Now Test the client
+
+
+
+
+1)
+Post
+---
+http://localhost:8080/bookMyShow-client/bookNow
+
+
+Body
+---
+{
+    "bookingId": 4,
+    "userName": "teju",
+    "showName": "pqr",
+    "bookingTime": "05/06/2021",
+    "userCount": 1,
+    "price": 350
+}
+
+---
+
+Hi teju your Request for pqr on date 2021-06-05Booking successfully..
+
+
+
+
+at provider side
+-------------------- 
+
+http://localhost:9090/BookMyShow/Service/getAllBooking
+
+
+[
+    {
+        "bookingId": 1,
+        "userName": "srini",
+        "showName": "abc",
+        "bookingTime": "02/06/2021",
+        "userCount": 1,
+        "price": 150
+    },
+    {
+        "bookingId": 2,
+        "userName": "sahi",
+        "showName": "abc",
+        "bookingTime": "03/06/2021",
+        "userCount": 1,
+        "price": 250
+    },
+    {
+        "bookingId": 3,
+        "userName": "teju",
+        "showName": "pqr",
+        "bookingTime": "05/06/2021",
+        "userCount": 1,
+        "price": 350
+    }
+]
+
+
+
+
+
+
+
+--->
+
+
+2) GET
+
+http://localhost:8080/bookMyShow-client/trackBookings
+
+
+
+
+[
+    {
+        "bookingId": 1,
+        "userName": "srini",
+        "showName": "abc",
+        "bookingTime": "02/06/2021",
+        "userCount": 1,
+        "price": 150
+    },
+    {
+        "bookingId": 2,
+        "userName": "sahi",
+        "showName": "abc",
+        "bookingTime": "03/06/2021",
+        "userCount": 1,
+        "price": 250
+    },
+    {
+        "bookingId": 3,
+        "userName": "teju",
+        "showName": "pqr",
+        "bookingTime": "05/06/2021",
+        "userCount": 1,
+        "price": 350
+    }
+]
+
+
+
+
+
+
+3)
+
+http://localhost:8080/bookMyShow-client/trackBookings/2
+
+
+
+Response
+-----
+{
+    "bookingId": 2,
+    "userName": "sahi",
+    "showName": "abc",
+    "bookingTime": "03/06/2021",
+    "userCount": 1,
+    "price": 250
+}
+
+
+
+
+
+
+4)
+/changeBooking/{bookingId}
+
+
+http://localhost:8080/bookMyShow-client/changeBooking/3
+
+
+
+RequestBody
+----
+{
+        "bookingId": 3,
+        "userName": "teju",
+        "showName": "pqrxyz",
+        "bookingTime": "07/06/2021",
+        "userCount": 2,
+        "price": 450
+    }
+    
+    
+    
+ 
+ 
+ Error
+ ----
+ {
+    "timestamp": "2021-06-02T17:42:02.234+00:00",
+    "path": "/bookMyShow-client/changeBooking/3",
+    "status": 500,
+    "error": "Internal Server Error",
+    "message": "400 Bad Request from PUT http://localhost:9090/BookMyShow/Service/updateBooking/3",
+    "requestId": "c121d15a-5",
+    "trace": "org.springframework.web.reactive.function.client.WebClientResponseException$BadRequest: 400 Bad Request from PUT http
+    
+    
+    
+    
+    
+    
+  Again Testing
+  -------
+  
+  
+  REquest body
+  ----
+  {
+        "showName": "pqrxyz",
+        "bookingTime": "07/06/2021",
+        "userCount": 2,
+        "price": 450
+    }
+    
+    
+ 
+ 
+ Response
+ -----
+ {
+    "bookingId": 3,
+    "userName": "teju",
+    "showName": "pqrxyz",
+    "bookingTime": "07/06/2021",
+    "userCount": 2,
+    "price": 450
+}
+
+
+
+
+
+5) Delete
+/removeBooking/{bookingId}        
+
+
+
+
+http://localhost:8080/bookMyShow-client//removeBooking/3
+
+
+Error:
+---
+{
+    "timestamp": "2021-06-02T17:45:43.966+00:00",
+    "path": "/bookMyShow-client//removeBooking/3",
+    "status": 404,
+    "error": "Not Found",
+    "message": null,
+    "requestId": "2a3c22aa-4",
+    
+    
+    
+ --->
+ becasue of   //  --> bookMyShow-client//
+ 
+ 
+ 
+ http://localhost:8080/bookMyShow-client/removeBooking/3
+    
+    
+ 
+ Response:
+ -----
+ 
+ Booking cancelled with bookingId : 3
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ At provider side
+ ---------
+ 
+ http://localhost:9090/BookMyShow/Service/getAllBooking
+ 
+ 
+ 
+ 
+ [{"bookingId":1,"userName":"srini","showName":"abc","bookingTime":"02/06/2021","userCount":1,"price":150.0},
+ {"bookingId":2,"userName":"sahi","showName":"abc","bookingTime":"03/06/2021","userCount":1,"price":250.0}]
+

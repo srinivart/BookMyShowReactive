@@ -1,0 +1,196 @@
+http://localhost:9090/h2-console/
+
+
+
+
+
+H2 console available at '/h2-console'. Database available at 'jdbc:h2:mem:testdb'
+
+
+select * from BOOK_MY_SHOW
+
+
+
+http://localhost:9090/BookMyShow/Service/getAllBooking
+
+
+
+
+Test in PostMan
+-------
+
+
+GET
+---
+
+http://localhost:9090/BookMyShow/Service/getAllBooking
+
+
+
+POST
+---
+http://localhost:9090/BookMyShow/Service/bookingShow
+
+
+Body
+----
+
+[
+    {
+        "bookingId": 1,
+        "userName": "srini",
+        "showName": "abc",
+        "bookingTime": "02/06/2021",
+        "userCount": 1,
+        "price": 200
+    },
+    {
+        "bookingId": 2,
+        "userName": "sahi",
+        "showName": "xyz",
+        "bookingTime": "03/06/2021",
+        "userCount": 1,
+        "price": 250
+    }
+]
+
+
+Hi srini your Request for abc on date Wed Jun 02 00:00:00 IST 2021Booking successfully..
+
+
+
+
+
+now test GET
+------
+
+http://localhost:9090/BookMyShow/Service/getAllBooking
+
+
+
+
+
+GET single
+-----------
+http://localhost:9090/BookMyShow/Service/getBooking/1
+
+
+
+
+
+
+Update Errors
+------
+PUT
+
+http://localhost:9090/BookMyShow/Service/updateBooking/2
+
+
+Body--> selected txt--> not json
+----
+{
+        "userName": "sahi",
+        "showName": "xyz",
+        "bookingTime": "03/06/2021",
+        "userCount": 1,
+        "price": 350
+    }
+    
+   
+ Errors
+ -----   
+    
+{
+    "timestamp": "2021-06-02T13:56:18.041+00:00",
+    "status": 415,
+    "error": "Unsupported Media Type",
+    "path": "/BookMyShow/Service/updateBooking/2"
+}
+
+
+
+-->
+Now its updated
+
+
+{
+    "bookingId": 2,
+    "userName": "sahi",
+    "showName": "xyzpqr",
+    "bookingTime": "03/06/2021",
+    "userCount": 1,
+    "price": 350
+}
+
+
+
+---------->
+
+DELETE
+---------
+
+
+http://localhost:9090/BookMyShow/Service/cancelBooking/2
+
+
+
+
+Booking cancelled with bookingId : 2
+
+
+
+
+
+
+
+
+
+
+
+h2-console
+--------
+
+select * from BOOK_MY_SHOW
+
+
+select * from BOOK_MY_SHOW;
+BOOKING_ID  	BOOKING_TIME  	PRICE  	SHOW_NAME  	USER_COUNT  	USER_NAME  
+1	2021-06-02 00:00:00	200.0	abc	1	srini
+3	2021-06-03 00:00:00	250.0	xyz	1	sahi
+
+
+
+
+
+
+
+With LocalDate
+----
+
+
+	@PostConstruct
+	public void initBookRequest() {
+		BookRequest b1 = new BookRequest(1,"srini","abc",LocalDate.of( 2021 , 6 , 2 ),1,150);
+		BookRequest b2 = new BookRequest(2,"sahi","abc",LocalDate.of( 2021 , 6 , 3 ),1,250);
+		repository.saveAll(Arrays.asList(b1,b2));
+	}	
+	
+	Output
+	-------
+[{"bookingId":1,"userName":"srini","showName":"abc","bookingTime":"2021-06-02","userCount":1,"price":150.0},{"bookingId":2,"userName":"sahi","showName":"abc","bookingTime":"2021-06-03","userCount":1,"price":250.0}]
+
+
+
+
+with Json format
+----------
+BookRequest.java
+-----------
+	@JsonFormat(pattern = "dd/MM/yyyy", shape = JsonFormat.Shape.STRING, timezone = "Asia/Kolkata")
+	private LocalDate bookingTime;
+
+
+[{"bookingId":1,"userName":"srini","showName":"abc","bookingTime":"02/06/2021","userCount":1,"price":150.0},{"bookingId":2,"userName":"sahi","showName":"abc","bookingTime":"03/06/2021","userCount":1,"price":250.0}]
+
+
+
